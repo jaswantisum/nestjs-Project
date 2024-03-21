@@ -1,46 +1,44 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { HttpCode } from '@nestjs/common';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
-  private userData: { [key: string]: CreateUserDto } = {};
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    this.userData['user'] = createUserDto; 
-    return this.userData;
+  async create(@Body() createUserDto: CreateUserDto) {
+    return await this.userService.create(createUserDto);
   }
 
   @Get()
-  findAll() {
-    return Object.values(this.userData);
+  async findAll() {
+    return await this.userService.findAll();
   }
 
-
-  @Get(':email')
-  findOne(@Param('email') email: string) {
-    console.log("userData",this.userData)
-    return this.userData[email] || 'User not found';
+  @Get(':id')
+  async findOne(@Param('id') id: string) {
+    return await this.userService.findOne(id);
   }
 
-  @Patch(':email')
-  update(@Param('email') email: string, @Body() updateUserDto: UpdateUserDto) {
-    if (this.userData[email]) {
-      this.userData[email] = { ...this.userData[email], ...updateUserDto };
-      return this.userData[email];
-    }
-    return 'User not found';
+  @Patch(':id')
+  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    return await this.userService.update(id, updateUserDto);
   }
 
-  @Delete(':email')
-  remove(@Param('email') email: string) {
-    if (this.userData[email]) {
-      delete this.userData[email];
-      return 'User deleted successfully';
-    }
-    return 'User not found';
+  @Delete(':id')
+  @HttpCode(204)
+  async remove(@Param('id') id: string) {
+    return await this.userService.remove(id);
   }
 }
