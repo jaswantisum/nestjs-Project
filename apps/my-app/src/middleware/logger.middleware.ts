@@ -9,7 +9,7 @@ export class LoggerMiddleware implements NestMiddleware {
     const dtoData = req.body;
     // console.log('dtoData',dtoData)
     res.on('finish', () => {     
-      npmlog.info(JSON.stringify(dtoData));
+      // npmlog.info(JSON.stringify(dtoData));
     });
 
     next();

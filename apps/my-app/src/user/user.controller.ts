@@ -6,18 +6,22 @@ import {
   Patch,
   Param,
   Delete,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { HttpCode } from '@nestjs/common';
+import { TimestampToDatePipe } from '../pipe/timeStampeToDate';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @UsePipes( new TimestampToDatePipe())
   @Post()
-  async create(@Body() createUserDto: CreateUserDto) {
+  async create(@Body() createUserDto: CreateUserDto,) {
     return await this.userService.create(createUserDto);
   }
 
@@ -25,7 +29,7 @@ export class UserController {
   async findAll() {
     return await this.userService.findAll();
   }
-
+  @UsePipes(new TimestampToDatePipe()) 
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return await this.userService.findOne(id);

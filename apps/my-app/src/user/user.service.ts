@@ -8,6 +8,7 @@ export class UserService {
 
   async create(createUserDto: CreateUserDto): Promise<{}> {
     try {
+      console.log('createUserDto',createUserDto)
       const newUser = {
         id: (this.users.length + 1).toString(),
         ...createUserDto,
