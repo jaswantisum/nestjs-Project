@@ -3,11 +3,12 @@ import { MyAppController } from './my-app.controller';
 import { MyAppService } from './my-app.service';
 import { UserModule } from './user/user.module';
 import { LoggerMiddleware } from './middleware/logger.middleware';
+import { DatabaseService } from './database.service';
 
 @Module({
   imports: [UserModule],
   controllers: [MyAppController],
-  providers: [MyAppService],
+  providers: [MyAppService,DatabaseService],
 })
 export class MyAppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
