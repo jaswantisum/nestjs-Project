@@ -1,6 +1,6 @@
 import { Type } from 'class-transformer';
-import { IsDateString, IsEmail, IsNotEmpty, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
-
+import { IsDateString, IsEmail, IsNotEmpty, IsNumber, IsOptional, IsString, Validate, ValidateNested } from 'class-validator';
+import { IsEmailUnique } from '../validator/isEmailUnique.validator';
 class Address {
   @IsString()
   @IsNotEmpty()
@@ -35,6 +35,7 @@ export class CreateUserDto {
   @IsEmail()
   @IsNotEmpty()
   @IsString()
+  @Validate(IsEmailUnique)
   email: string;
 
   @IsString()

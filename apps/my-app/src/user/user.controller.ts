@@ -20,12 +20,13 @@ import { HttpCode } from '@nestjs/common';
 import { TimestampToDatePipe } from 'y/common/pipe/timeStampeToDate';
 
 import { AuthGuard } from '@nestjs/passport';
-
+import { JwtGuard } from 'y/common/guard/jwt-auth.guard';
 
 @Controller('user')
+@UseGuards(JwtGuard)
 export class UserController {
   constructor(private readonly userService: UserService) {}
-  @UseGuards(AuthGuard('jwt'))
+
   @UsePipes(new TimestampToDatePipe())
   @Post()
   async create(@Body() createUserDto: CreateUserDto) {

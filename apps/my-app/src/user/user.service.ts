@@ -48,7 +48,9 @@ export class UserService {
 
   async findOne(id: string): Promise<User> {
     try {
-      return this.userModel.findById(id).populate('address').exec();
+      const user= await this.userModel.findById(id).populate('address').exec();
+      console.log('user',user)
+      return user
     } catch (error) {
       throw error;
     }

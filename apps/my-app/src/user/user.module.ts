@@ -10,6 +10,7 @@ import { AuthService } from '../auth/auth.service';
 import { Address,AddressSchema } from './schema/address.schema';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtGuard } from 'y/common/guard/jwt-auth.guard';
+import { IsEmailUnique } from './validator/isEmailUnique.validator';
 
 @Module({
   imports:[ MongooseModule.forFeature([
@@ -18,7 +19,7 @@ import { JwtGuard } from 'y/common/guard/jwt-auth.guard';
     
   ])],
   controllers: [UserController],
-  providers: [UserService,
+  providers: [UserService,IsEmailUnique
     
   ],
   exports:[UserService]

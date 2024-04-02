@@ -13,7 +13,7 @@ export class AuthService {
 
   async validateUser(user: User): Promise<any> {
     try {
-      return await  this.login(user);
+      return await this.login(user);
     } catch (error) {
       throw error;
     }

@@ -4,6 +4,7 @@ import {
   ForbiddenException,
   Post,
   Request,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
@@ -18,7 +19,7 @@ export class AuthController {
     private userService: UserService,
   ) {}
 
-  // @UseGuards(AuthGuard('jwt'))
+
   @Post('login')
   async login(@Request() req) {
     try {
@@ -37,7 +38,7 @@ export class AuthController {
       }
       return await this.authService.validateUser(user);
     } catch (error) {
-      throw new ForbiddenException('Incorrect credentials');
+      throw new UnauthorizedException('Incorrect credentials');
     }
   }
 }
