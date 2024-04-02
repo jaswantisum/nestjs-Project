@@ -1,75 +1,84 @@
-// src/user/user.service.ts
-
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { DatabaseService } from '../database.service';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 import { CreateUserDto } from './dto/create-user.dto';
+import { User } from './schema/user.schema';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ObjectId,InsertOneResult, FindOneAndUpdateOptions } from 'mongodb';
+import { Address } from './schema/address.schema';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
-    constructor(private readonly dbService: DatabaseService) {}
+  constructor(
+    @InjectModel(User.name) private readonly userModel: Model<User>,
+    @InjectModel(Address.name) private readonly addressModel: Model<Address>,
+  ) {}
 
-    async create(createUserDto: CreateUserDto) {
-        try {
-          const userCollection = this.dbService.getUserCollection();
-          const result = await userCollection.insertOne(createUserDto);
-          console.log('result',result)
-          return result; 
-        } catch (error) {
-            throw new Error('Failed to create Record.');
-        }
-    }
+  async create(createUserDto: CreateUserDto): Promise<User> {
+    try {
+      const { address, ...userData } = createUserDto;
+      const existingUser = await this.findbyEmail(createUserDto.email);
 
-    async findAll(): Promise<any[]> {
-        try {
-            const userCollection = this.dbService.getUserCollection();
-            return await userCollection.find({}).toArray();
-        } catch (error) {
-            throw new Error('Failed to fetch Records.');
-        }
-    }
+      if (existingUser) {
+        throw new BadRequestException('Email already exists');
+      }
+      const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
+      const newUser = { ...createUserDto, password: hashedPassword };
 
-    async findOne(id: string): Promise<any> {
-        try {
-            const userCollection = this.dbService.getUserCollection();
-            const user = await userCollection.findOne({ _id: new ObjectId(id) });
-            if (!user) {
-                throw new NotFoundException('Record not found.');
-            }
-            return user;
-        } catch (error) {
-            throw new Error('Failed to find Record.');
-        }
-    }
+      const createdAddress = new this.addressModel(address);
+      const savedAddress = await createdAddress.save();
 
-    async update(id: string, updateUserDto: UpdateUserDto): Promise<any> {
-        try {
-            const userCollection = this.dbService.getUserCollection();
-            const result = await userCollection.findOneAndUpdate(
-                { _id: new ObjectId(id) },
-                { $set: updateUserDto },
-                { returnOriginal: false } as FindOneAndUpdateOptions
-            );
-            if (!result.value) {
-                throw new NotFoundException('Record not found.');
-            }
-            return result.value;
-        } catch (error) {
-            throw new Error('Failed to update Record.');
-        }
+      const createdUser = new this.userModel({
+        ...newUser,
+        address: savedAddress._id,
+      });
+      return createdUser.save();
+    } catch (error) {
+      throw error;
     }
+  }
 
-    async remove(id: string) {
-        try {
-            const userCollection = this.dbService.getUserCollection();
-            await userCollection.deleteOne({ _id: new ObjectId(id) });
-            return {
-                statusCode: 204,
-                message: 'No Available Content for this Request',
-            };
-        } catch (error) {
-            throw new Error('Failed to remove Record.');
-        }
+  async findAll(): Promise<User[]> {
+    try {
+      return this.userModel.find().populate('address').exec();
+    } catch (error) {
+      throw error;
     }
+  }
+
+  async findOne(id: string): Promise<User> {
+    try {
+      return this.userModel.findById(id).populate('address').exec();
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+    try {
+      return this.userModel
+        .findByIdAndUpdate(id, updateUserDto, { new: true })
+        .exec();
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async remove(id: string): Promise<void> {
+    try {
+      await this.userModel.findByIdAndDelete(id).exec();
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async findbyEmail(email: string) {
+    try {
+      const findbyEmail = await this.userModel.findOne({ email }).exec();
+
+      return findbyEmail;
+    } catch (error) {
+      throw error;
+    }
+  }
 }

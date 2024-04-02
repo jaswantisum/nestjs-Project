@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsDateString, IsEmail, IsNotEmpty, IsNumber, IsString, ValidateNested } from 'class-validator';
+import { IsDateString, IsEmail, IsNotEmpty, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
 
 class Address {
   @IsString()
@@ -7,6 +7,7 @@ class Address {
   address1: string;
 
   @IsString()
+  @IsOptional()
   address2: string;
 
   @IsString()
