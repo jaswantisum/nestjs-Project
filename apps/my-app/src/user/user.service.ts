@@ -15,13 +15,14 @@ export class UserService {
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
+  
     try {
       const { address, ...userData } = createUserDto;
-      const existingUser = await this.findbyEmail(createUserDto.email);
+      // const existingUser = await this.findbyEmail(createUserDto.email);
 
-      if (existingUser) {
-        throw new BadRequestException('Email already exists');
-      }
+      // if (existingUser) {
+      //   throw new BadRequestException('Email already exists');
+      // }
       const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
       const newUser = { ...createUserDto, password: hashedPassword };
 

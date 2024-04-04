@@ -15,17 +15,23 @@ import { AuthModule } from './auth/auth.module';
 import { APP_FILTER } from '@nestjs/core';
 import { GlobalExceptionFilter } from 'y/common/exceptionFilter/global-exception.filter';
 import { ResponseFormattingInterceptor } from 'y/common/interceptor/response-formatting.interceptor';
+import { DatabaseService } from './database.provider';
 
 @Module({
-  imports: [MongooseModule.forRoot('mongodb+srv://jaswant:l668xtw5aT9JIfep@cluster0.qvvobzq.mongodb.net/'),UserModule,AuthModule],
+  imports: [
+    // MongooseModule.forRootAsync({
+    //   useClass: DatabaseService,
+    // }),
+    MongooseModule.forRoot('mongodb+srv://jaswant:l668xtw5aT9JIfep@cluster0.ethadiy.mongodb.net/'),
+  UserModule,AuthModule],
   controllers: [MyAppController],
   providers: [
     MyAppService,
     { provide: APP_FILTER, useClass: GlobalExceptionFilter },
-    {
-      provide: 'APP_INTERCEPTOR',
-      useClass: ResponseFormattingInterceptor,
-    },
+    // {
+    //   provide: 'APP_INTERCEPTOR',
+    //   useClass: ResponseFormattingInterceptor,
+    // },
     // {
     //   provide: DatabaseService,
     //   useFactory: async () => {
